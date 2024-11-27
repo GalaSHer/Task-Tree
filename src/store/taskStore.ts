@@ -58,15 +58,24 @@ class TaskStore {
     });
   }
 
-  checkParentStatus(task: Task) {
+  checkParentStatus(task: ITask, visited: Set<ITask> = new Set()) {
+    if (visited.has(task)) {
+      return;
+    }
+    visited.add(task);
+
     const allSubTasksChecked = task.subTasks.every(subTask => {
       if (subTask.subTasks.length > 0) {
-        this.checkParentStatus(subTask);
+        this.checkParentStatus(subTask, visited);
       }
       return subTask.isChecked;
     });
-  
+
     task.isChecked = allSubTasksChecked;
+
+    if (task.parent) {
+      this.checkParentStatus(task.parent, visited);
+    }
   }
 }
 
